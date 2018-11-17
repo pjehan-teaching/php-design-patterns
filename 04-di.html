@@ -1,0 +1,196 @@
+<section id="di">
+
+    <section>
+        <h2>Dependency Injection (DI)</h2>
+    </section>
+
+    <section>
+        <h3>Présentation</h3>
+        <p>L’injection de dépendance (ou Dependency Injection) est un design pattern qui <strong>ne fait pas partie</strong> des 23 design patterns du GoF.</p>
+        <p>Il permet d’<strong>éviter un couplage fort</strong> entre plusieurs classes en évitant d’instancier un objet directement dans une méthode. Pour cela, nous passerons <strong>en paramètre du constructeur ou via une méthode l’objet</strong> qui pourra ensuite être utilisé. Nous pourrons ainsi définir en paramètre une interface ce qui permettra également de bénéficier des avantages du <strong>polymorphisme</strong>.</p>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Vous souhaitez pouvoir gérer dans votre application des véhicules ainsi que leur géolocalisation. Vous créez donc les deux classes suivantes :</p>
+        <pre><code class="language-php">class Gmap
+{
+   public function getLatLng(string $address): LatLng
+   {
+        // Retourne un objet LatLng à partir d'une adresse
+   }
+}</code></pre>
+        <pre><code class="language-php">class Vehicule
+{
+   private $address;
+   public function getLocation(): LatLng
+   {
+      $gmap = new Gmap();
+      return $gmap->getLatLng($this->address);
+   }
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Cela entraîne un couplage fort entre la classe <code class="language-php">Vehicule</code> et la classe <code class="language-php">Gmap</code>. De ce fait, si l’on souhaite changer de service pour utiliser un système de localisation différent (BingMap par exemple), nous allons rencontrer des difficultés.</p>
+        <p>La solution serait d’externaliser l’instanciation du service (GoogleMap, BingMap…) puis ensuite de l’<strong>injecter</strong> dans notre classe <code class="language-php">Vehicule</code>.</p>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Pour cela, nous allons commencer par définir une interface qui nous permettra de lister les méthodes nécessaires à tout service de géolocalisation. Pour le moment, notre interface ne contiendra qu'une seule méthode <code class="language-php">getLatLng()</code> :</p>
+        <pre><code class="language-php">interface MapService
+{
+   function getLatLng(string $address): LatLng;
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Maintenant que notre interface est définie, nous allons pouvoir l'utiliser pour ajouter un paramètre au constructeur de notre classe <code class="language-php">Vehicule</code> :</p>
+        <pre><code class="language-php">class Vehicule
+{
+   private $address;
+   private $mapService;
+
+   public function __construct(MapService $mapService)
+   {
+      $this->mapService = $mapService;
+   }
+
+   public function getLocation(): LatLng
+   {
+      return $this->mapService->getLatLng($this->address);
+   }
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Il est maintenant possible d’effectuer l’injection de dépendance en passant un objet via le constructeur mais nous aurions pu également effectuer l'injection via une méthode ou bien en modifiant directement une propriété de l’objet. La page suivante sur la <a href="https://symfony.com/doc/current/service_container/injection_types.html" target="_blank">documentation officielles</a> de Symfony décrit ces trois possibilités en expliquant comment les implémenter dans votre code.</p>
+        <p>La classe <code class="language-php">Vehicule</code> contient une propriété <code class="language-php">MapService</code>. Nous avons donc respecter les principes de la programmation orientée objet en utilisant la <strong>composition plutôt que l'héritage</strong>.</p>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Nous pouvons maintenant implémenter cette interface dans les classes Gmap, BingMap…</p>
+        <pre><code class="language-php">class Gmap implements MapService
+{
+   public function getLatLng(string $address): LatLng
+   {
+   }
+}
+</code></pre>
+        <pre><code class="language-php">$gmapService = new Gmap();
+$vehicule = new Vehicule($gmapService);
+$vehicule->setAddress("...");
+$location = $vehicule->getLocation();</code></pre>
+    </section>
+
+    <section>
+        <h3>Conteneur d'injection de dépendances (DIC)</h3>
+        <p>La solution précédente présente des limitations si le nombre de dépendances devient trop important.</p>
+        <p>Pour répondre à cela, nous pouvons créer un <strong>conteneur d'injection de dépendances</strong> qui se chargera d’instancier et de configurer d’autres objets.</p>
+        <p>Nous pourrions pour cela créer une classe <code class="language-php">Container</code> qui contiendra une méthode <code class="language-php">getVehicule()</code> qui se chargera de retourner une instance de <code class="language-php">Vehicule</code> en injectant les dépendances nécessaires.</p>
+    </section>
+
+    <section>
+        <h3>Conteneur d'injection de dépendances (DIC)</h3>
+        <p>Cependant, nous allons mettre en oeuvre une autre méthode plus générique en utilisant les Closure du langage PHP. Nous allons donc créer une classe <code class="language-php">Container</code> avec une propriété statique <code class="language-php">$services</code> qui sera un tableau contenant les différents services de notre application. Cette propriété sera statique afin de conserver la liste des services même si une nouvelle instance de <code class="language-php">Container</code> est demandée. Notre classe contiendra également deux méthodes, <code class="language-php">add()</code> et <code class="language-php">get()</code> qui nous permettrons respectivement d’ajouter et de récupérer des services.</p>
+        <p>Enfin, chaque service sera représenté par un objet <code class="language-php">Service</code> qui contiendra deux paramètres <code class="language-php">$closure</code> et <code class="language-php">$instance</code>.</p>
+        <p><code class="language-php">$closure</code> contenant une Closure permettant de créer l’objet et <code class="language-php">$instance</code> contenant l’instance de l’objet.</p>
+    </section>
+
+    <section>
+        <h3>Conteneur d'injection de dépendances (DIC)</h3>
+        <p>Nous allons commencer par créer notre classe <code class="language-php">Service</code> :</p>
+        <pre><code class="language-php">class Service
+{
+   private $closure;
+   private $instance;
+
+   public function __construct(\Closure $closure)
+   {
+      $this->closure = $closure;
+   }
+
+   public function getInstance()
+   {
+      if ($this->instance === null) {
+         $this->instance = ($this->closure)();
+      }
+      return $this->instance;
+   }
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Conteneur d'injection de dépendances (DIC)</h3>
+        <p>Nous allons maintenant créer la classe <code class="language-php">Container</code> :</p>
+        <pre style="max-height: 500px;"><code class="language-php">class Container
+{
+  static protected $services = array();
+
+  /**
+   * @param string $id Identifiant du service
+   * @param Closure $closure Fonction permettant de créer l'instance
+   */
+  public function add(string $id, \Closure $closure)
+  {
+     self::$services[$id] = new Service($closure);
+  }
+
+  /**
+   * @param string $id Identifiant du service
+   * @return object Service instance
+   */
+  public function get(string $id)
+  {
+     if(!isset(self::$services[$id])) {
+        throw new Exception("Service with id " . $id . " does not exists!");
+     }
+     return self::$services[$id]->getInstance();
+  }
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Conteneur d'injection de dépendances (DIC)</h3>
+        <p>Enfin, nous pourrions utiliser notre code de la façon suivante :</p>
+        <pre><code class="language-php">$container = new Container;
+
+$container->add(Vehicule::class, function() {
+   $mapService = new Gmap();
+   return new Vehicule($mapService);
+});
+
+$vehicule = $container->get(Vehicule::class);
+$vehicule->setAddress("18 rue de Lorient, 35000 Rennes");
+print_r($vehicule->getLocation());</code></pre>
+    </section>
+
+    <section>
+        <h3>Inversion de contrôle (IoC)</h3>
+        <div class="container">
+            <div class="col">
+                <p>L’injection de dépendance permet également de mettre en place le principe d’inversion de contrôle (Inversion of Control ou IoC).</p>
+                <p>En programmation procédurale, c’est votre code qui fait appel aux librairies externes. Avec la programmation orientée objet et le principe d’inversion de contrôle, ce sont <strong>les librairies externes qui vont faire appel à votre code</strong>.</p>
+            </div>
+            <div class="col">
+                <img src="assets/images/ioc.png" alt="IoC">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Twittee</h3>
+        <p><a href="http://www.twittee.org" target="_blank">Twittee</a> est un conteneur d'injection de dépendances qui tient dans un tweet (140 caractères) !</p>
+        <p>Twittee est extrêment basique et à été développé par Fabien Potencier afin de se rendre compte qu'il est possible de créer un DIC (Dependency Injection Container) en quelques lignes de code.</p>
+    </section>
+
+    <section>
+        <h3>Conteneur d'injection de dépendances (DIC)</h3>
+    </section>
+
+</section>

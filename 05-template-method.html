@@ -1,0 +1,188 @@
+<section id="template-method">
+
+    <section>
+        <h2>Template Method</h2>
+        <h3>(Behavioral)</h3>
+    </section>
+
+    <section>
+        <h3>Présentation</h3>
+        <p>Le design pattern <strong>Template Method</strong> permet de définir le déroulé d'un algorithme tout en laissant les classes enfants définir certaines de ces étapes.</p>
+        <p>La classe principale définit des méthodes et les classes enfants pourront ensuite implémenter ces méthodes.</p>
+    </section>
+
+    <section>
+        <h3>Diagramme de classe</h3>
+        <img src="assets/images/template-method.png" alt="Template Method">
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Dans cette exemple, nous allons créer des classes qui nous permettrons de gérer l'upload d'image ou de vidéo.</p>
+        <p>Nous verrons ensuite comment l'utilisation du design pattern <strong>Template Method</strong> nous permettra d'optimiser notre code source.</p>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <pre style="max-height: 600px;"><code class="language-php">class ImageUpload
+{
+   public function handle()
+   {
+      $this->rename();
+      $this->resize();
+      $this->changeQuality();
+      $this->move();
+   }
+
+   public function rename()
+   {
+      echo "Rename image<br>";
+   }
+
+   public function resize()
+   {
+      echo "Resize image<br>";
+   }
+
+   public function changeQuality()
+   {
+      echo "Change image quality<br>";
+   }
+
+   public function move()
+   {
+      echo "Move image<br>";
+   }
+}
+</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <pre style="max-height: 600px;"><code class="language-php">class VideoUpload
+{
+   public function handle()
+   {
+      $this->rename();
+      $this->extractSequence();
+      $this->changeQuality();
+      $this->move();
+   }
+
+   public function rename()
+   {
+      echo "Rename video<br>";
+   }
+
+   public function extractSequence()
+   {
+      echo "Extract video sequence<br>";
+   }
+
+   public function changeQuality()
+   {
+      echo "Change video quality<br>";
+   }
+
+   public function move()
+   {
+      echo "Move video<br>";
+   }
+}
+</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Nous observont de nombreuses similitudes entre ces deux classes :</p>
+        <p>Nous avons dans nos deux classes <strong>deux méthodes qui effectuent rigoureusement la même tâche</strong> pour une image ou une vidéo : <code class="language-php">rename()</code> et <code class="language-php">move()</code> . Il y a également <strong>deux fois la même méthode</strong> <code class="language-php">changeQuality()</code> mais le code implémenté dans ces méthodes sera <strong>différents en fonction du type de fichier</strong> à traiter (image ou vidéo). Enfin, les méthodes <code class="language-php">resize()</code> et <code class="language-php">extractSequence()</code> ont des <strong>noms différents mais l'objectif de ces deux méthodes est similaire</strong> : redimensionner le média à traiter.</p>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Nous allons donc utiliser l'abstraction pour créer une classe parent qui comprendra l'ensemble des méthodes communes à ces deux classes :</p>
+        <pre style="max-height: 550px;"><code class="language-php">abstract class FileUpload
+{
+   public final function handle()
+   {
+      $this->rename();
+      $this->resize();
+      $this->changeQuality();
+      $this->move();
+   }
+
+   public function rename()
+   {
+      echo "Rename file<br>";
+   }
+
+   public abstract function resize();
+
+   public abstract function changeQuality();
+
+   public function move()
+   {
+      echo "Move file<br>";
+   }
+}
+</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Nous allons maintenant modifier le code des classes <code class="language-php">ImageUpload</code> et <code class="language-php">VideoUpload</code> afin qu'elles étendent la classe <code class="language-php">FileUpload</code> :</p>
+        <div class="container">
+            <div class="col">
+                <pre><code class="language-php">class ImageUpload extends FileUpload
+{
+   public function resize()
+   {
+      echo "Resize image<br>";
+   }
+
+   public function changeQuality()
+   {
+      echo "Change image quality<br>";
+   }
+}</code></pre>
+            </div>
+            <div class="col">
+<pre><code class="language-php">class VideoUpload extends FileUpload
+{
+   public function resize()
+   {
+      echo "Extract video sequence<br>";
+   }
+
+   public function changeQuality()
+   {
+      echo "Change video quality<br>";
+   }
+}</code></pre>
+            </div>
+        </div>
+    </section>
+    
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <img src="assets/images/template-method-fileupload.png" alt="Template Method File Upload">
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <ul>
+            <li><strong>Single responsibility</strong> : Notre code est correctement découpé et chaque méthodes de chaque classe réalise une et une seule tâche.</li>
+            <li><strong>Open/Closed</strong> : Notre code est ouvert à l'extension car il sera simple d'ajouter une nouvelle gestion d'upload (pour les fichiers audio par exemple). Il est cependant fermé à la modification et la classe abstraite ne devrait pas être modifiée. De plus, la méthode  handle()  de cette classe étant marquée comme final, elle ne pourra pas être surchargée.</li>
+            <li><strong>Substitution principle</strong> : Grâce à la classe abstraite, il sera possible de traiter de la même manière un upload d'image ou de vidéo.</li>
+            <li><strong>Interface segregation principle</strong> : Dans le cas du design pattern Template Method, une seule interface est nécessaire mais ce principe est tout de même respecté.</li>
+            <li><strong>Dependency inversion principle</strong> : La classe client qui se chargera de gérer l'upload pourra dépendre de la classe abstraite et non des classes concrètes.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Template Method pour les hooks</h3>
+        <p>Les hooks sont un système assez commun en programmation consistant à laisser la possibilité de venir exécuter du code à un instant T lors du déroulement d'un algorithme. </p>
+        <p>Nous pourrions par exemple ajouter dans notre classe abstraite des méthodes vides (non-implémentées) <code class="language-php">postResize()</code> et <code class="language-php">preResize()</code> qui pourront éventuellement être implémentées dans les classes enfants.</p>
+    </section>
+
+</section>

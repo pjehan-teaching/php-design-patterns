@@ -1,0 +1,147 @@
+<section id="presentation">
+
+    <section>
+        <h2>Présentation</h2>
+    </section>
+
+    <section>
+        <h3>Qu'est-ce que c'est ?</h3>
+        <p>Les design patterns sont des solutions génériques permettant de répondre à des problèmes réccurents rencontrés en conception.</p>
+        <p>Il s'agit d'architectures utilisant les principes fondamentaux de la programmation orientée objet et permettant d'organiser son code de manière optimale</p>
+    </section>
+
+    <section>
+        <h3>Historique</h3>
+        <div class="container">
+            <div class="col" style="flex: 2;">
+                <p>Les patterns ont été introduit dans le domaine de l'architecture par Christopher Alexander fin des années 70.</p>
+                <p>Ils ont ensuite été repris dans le domaine du développement logiciel puis popularisés par le livre "Design Patterns: Elements of Reusable Object-Oriented Software" rédigé en 1994 par Erich Gamma, Richard Helm, Ralph Johnson et Vlissides John (GoF).</p>
+            </div>
+            <div class="col">
+                <img src="assets/images/gof-book.jpg" alt="Design Patterns: Elements of Reusable Object-Oriented Software">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>SOLID</h3>
+        <ul>
+            <li>Single responsibility : Une classe ou une méthode doit faire une et une seule chose.</li>
+            <li>Open/closed : Classe ouverte à l’extension mais fermée à la modification.</li>
+            <li>Liskov substitution : Favoriser l’utilisation des interfaces pour permettre d’utiliser différents objets implémentant cette interface.</li>
+            <li>Interface segregation : Préférer créer plusieurs interfaces spécifiques que peu d’interfaces répondant à plusieurs besoins.</li>
+            <li>Dependency inversion : Utiliser une couche abstraite pour permettre la communication entre les modules de haut niveau et les modules de base niveau.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Découplage du code</h3>
+        <p>Les design patterns vous permettrons de découpler (low coupling) les objets, c’est-à-dire d’éviter de créer des liens forts entre plusieurs objets.</p>
+        <img src="assets/images/low-coupling.png" alt="Low Coupling">
+        <p>Le découplage permet d’apporter une plus grande flexibilité et extensibilité à votre code.</p>
+    </section>
+
+    <section>
+        <h3>Découplage du code</h3>
+        <div class="container">
+            <div class="col">
+                <p>Dans cet exemple, la classe  Classe A  fait référence directement à la classe  Classe C  ce qui empêche les classes  Classe B  et  Classe D  d’utiliser la classe  Classe A . Dans le schéma suivant, la classe  Classe A  fait référence à une interface ce qui permet ensuite aux classes  Classe B ,  Classe C  et  Classe D  d’utiliser la classe  Classe A .</p>
+            </div>
+            <div class="col">
+                <img src="assets/images/interface-advantages.png" alt="Avantage des interfaces">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Découplage du code</h3>
+        <pre><code class="language-php">class ClasseA
+{
+   private $autreClasse;
+
+   // Méthode avec couplage fort
+   public function maMethode()
+   {
+      $this->autreClasse = new ClasseB();
+   }
+
+   // Méthode avec couplage faible
+   public function maMethode(Interface $maClasse)
+   {
+      $this->autreClasse = $maClasse;
+   }
+}
+</code></pre>
+    </section>
+
+    <section>
+        <h3>Catégories de design patterns</h3>
+        <ol>
+            <li><strong>Creational</strong> (de création) : Il s’agit de design patterns permettant d’améliorer le processus de <strong>création d’un objet</strong>. Par exemple, Abstract Factory permettra d’instancier des objets sans faire appel directement à leurs classes.</li>
+            <li><strong>Structural</strong> (de structure) : Ce sont des design patterns permettant de décrire différentes manières d’<strong>associer des objets</strong>. Par exemple, Decorator vous permettra d’éviter l’utilisation excessive de l’héritage en ajoutant dynamiquement des fonctionnalités aux objets.</li>
+            <li><strong>Behavioral</strong> (de comportement) : Les design patterns de cette catégorie permettent de <strong>faire interagir plusieurs objets ensemble</strong> dans le but de réaliser une tâche qu’un seul objet ne pourrait pas faire tout seul. Par exemple, le design pattern Observer vous permettra de mettre en place un système de notification entre vos objets. Le design pattern Template Method que nous avons découvert dans le chapitre précédent fait également partie de cette catégorie.</li>
+        </ol>
+    </section>
+
+    <section>
+        <h3>Creational</h3>
+        <ul>
+            <li><strong>Abstract Factory</strong> : Interface permettant de créer des objets de la même famille sans faire appel directement à leurs classes.</li>
+            <li><strong>Builder</strong> : Séparer la construction d’un objet complexe de sa représentation afin que le même processus de construction puisse créer différentes représentations.</li>
+            <li><strong>Factory Method</strong> : Interface permettant de créer des objets mais laissant les classes enfants décider de la classe à instancier.</li>
+            <li><strong>Prototype</strong> : Spécifie le type d’objet à créer en utilisant une instance de prototype puis créer des objets en copiant ce prototype.</li>
+            <li><strong>Singleton</strong> : Permet de s’assurer qu’une classe n’a été instanciée qu’une seule fois.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Structural</h3>
+        <ul>
+            <li><strong>Adapter</strong> : Convertit l’interface d’une classe en une autre interface attendue par le client. Cela permet à des classes de pouvoir communiquer entre-elles même si leurs interfaces sont incompatibles.</li>
+            <li><strong>Bridge</strong> : Sépare une abstraction de son implémentation pour que les deux puissent varier indépendamment.</li>
+            <li><strong>Composite</strong> : Décompose plusieurs objets dans une structure en arbre afin de représenter une hiérarchie. Cela permet ensuite de traiter un objet ou un groupe d’objet de la façon uniforme.</li>
+            <li><strong>Decorator</strong> : Évite l’utilisation excessive de l’héritage en ajoutant dynamiquement des fonctionnalités aux objets.</li>
+            <li><strong>Facade</strong> : Interface simplifiant l’utilisations d’autre interfaces sous-jacentes.</li>
+            <li><strong>Flyweight</strong> : Permet de manipuler de nombreux objets de petites tailles en diminuant le nombre d’objets à instancier.</li>
+            <li><strong>Proxy</strong> : Classe venant remplacer une autre classe et permettant ainsi de contrôler les accès.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Behavioral</h3>
+        <ul>
+            <li><strong>Chain of Responsibility</strong> : Évite de créer un lien fort entre l’objet envoyant une requête et celui chargé de la traitée en laissant d’autres objets la possibilité de s’en charger. Plusieurs objets peuvent ainsi être chaînés les uns aux autres et faire suivre une requête s'ils ne peuvent pas la traiter.</li>
+            <li><strong>Command</strong> : Encapsule une requête dans un objet qui pourra ensuite être paramétré, positionné dans une file d’attente, dans des logs ou pourra être annulé.</li>
+            <li><strong>Interpreter</strong> : A partir d’un langage, définit une représentation de celui-ci ainsi qu’un interpréteur qui utilisera la représentation pour interpréter un message.</li>
+            <li><strong>Iterator</strong> : Permet d'accéder à un ensemble d’éléments de façon séquentielle sans en exposer sa représentation.</li>
+            <li>...</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Behavioral</h3>
+        <ul>
+            <li><strong>Mediator</strong> : Définit un objet qui encapsule la manière dont plusieurs objets vont interagir entre eux évitant ainsi un couplage fort entre les objets.</li>
+            <li><strong>Memento</strong> : Sans remettre en question le principe d’encapsulation, ce design pattern permet d’externaliser l’état interne d’un objet permettant ainsi de le restaurer à un état antérieur.</li>
+            <li><strong>Observer</strong> : Définit une relation un à plusieurs entre plusieurs objets de tel façon que si l’état d’un objet est modifié, d’autres objets pourront être notifiés du changement.</li>
+            <li><strong>State</strong> : Permet à un objet de modifier son comportement lorsque son état interne change.</li>
+            <li><strong>Strategy</strong> : Définit une famille d’algorithmes en les encapsulant permettant ainsi de les interchanger plus facilement.</li>
+            <li><strong>Template Method</strong> : Définit le squelette d’un algorithme en laissant les classes enfants redéfinir certaines étapes de l'algorithme.</li>
+            <li><strong>Visitor</strong> : Représente une opération à effectuer sur un ensemble d’objets sans avoir à les modifier.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Relations entre les design patterns</h3>
+        <div style="max-height: 600px; overflow: auto;">
+            <img src="assets/images/design-patterns-relationships.png" alt="Relations entre les design patterns">
+        </div>
+    </section>
+
+    <section>
+        <h3>Autres design patterns</h3>
+        <p>La liste présentée dans les slides précédentes n'est pas une liste exhaustive. Cette liste de 23 design patterns ayant été publié en 1994, de nombreux design patterns ont été découverts depuis.</p>
+        <p>On trouvera en autre les design patterns <strong>Mock Object</strong> (utilisé par exemple par la librairie PHPUnit), <strong>Front Controller</strong> (utilisé principalement par les frameworks web pour spécifier un point d'entré unique pour l'ensemble des requêtes) ou encore <strong>Marker</strong> (utilisé pour la mise en place d'annotations).</p>
+    </section>
+
+</section>
