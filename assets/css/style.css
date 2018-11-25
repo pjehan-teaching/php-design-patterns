@@ -1,0 +1,4 @@
+.reveal section pre,
+.reveal section pre code[class*="language-"] {
+    line-height: 1.2;
+}

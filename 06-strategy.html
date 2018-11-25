@@ -9,11 +9,156 @@
         <h3>Présentation</h3>
         <p>Le design pattern Strategy peut être mis en place lorsque <strong>plusieurs algorithmes</strong> peuvent être utilisés pour effectuer <strong>une même tâche</strong>.</p>
         <p>Il permet de masquer et d’<strong>encapsuler</strong> ces algorithmes et évite l’utilisation de conditions afin de déterminer celui qui doit être utilisé.</p>
+        <p>Ce design pattern favorise la composition plutôt que l'héritage.</p>
     </section>
 
     <section>
         <h3>Diagramme de classe</h3>
         <img src="assets/images/strategy.png" alt="Strategy">
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Dans cette exemple, nous allons construire des voitures et permettre aux développeurs de choisir le moteur qui sera utilisé.</p>
+        <p>Pour cela, nous allons commencer par créer une interface comprenant les méthodes communes à l'ensemble des moteurs :</p>
+        <pre><code class="language-php">interface Moteur
+{
+    public function Demarrer(): string;
+    public function Recharger(): string;
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Nous allons maintenant créer 2 types de moteurs (essence / éléctrique) :</p>
+        <div class="container">
+            <div class="col">
+                <pre><code class="language-php">class MoteurEssence implements Moteur
+{
+    public function Demarrer(): string
+    {
+        return "Vroum vroum";
+    }
+
+    public function Recharger(): string
+    {
+        return "Glou glou glou";
+    }
+}</code></pre>
+            </div>
+            <div class="col">
+                <pre><code class="language-php">class MoteurElectrique implements Moteur
+{
+    public function Demarrer(): string
+    {
+        return "*silence*";
+    }
+
+    public function Recharger(): string
+    {
+        return "Gzzzt";
+    }
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Nous allons ensuite créer une class Voiture qui utilisera l'un des deux moteurs en fonction :</p>
+        <pre><code class="language-php">class Voiture
+{
+    /** @var Moteur */
+    private $moteur;
+    /** @var int */
+    private $energie;
+
+    public function __construct(bool $ecologiste = false)
+    {
+        $this->energie = 0;
+        if ($ecologiste) {
+            $this->moteur = new MoteurElectrique();
+        } else {
+            $this->moteur = new MoteurEssence();
+        }
+    }
+
+    public function avancer()
+    {
+        if ($this->energie == 0) {
+            echo $this->moteur->Recharger() . "<br>";
+        }
+        echo $this->moteur->Demarrer() . "<br>";
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Exemple d'utilisation</h3>
+        <p>Enfin, nous allons utiliser ces différentes classes pour créer deux voitures :</p>
+        <pre><code class="language-php">echo "Contruction d'une Renault Zoe<br>";
+$zoe = new Voiture(true);
+$zoe->avancer();
+
+echo "Contruction d'une Ford Mustang<br>";
+$mustang = new Voiture();
+$mustang->avancer();</code></pre>
+    </section>
+
+    <section>
+        <h3>Strategy et la sécurité dans Symfony</h3>
+        <p>Le pattern Strategy est mis en place dans le composant gérant la sécurité  via le système de <strong>Voters</strong>.</p>
+        <p>Lorsque vous faites appel à la méthode <code class="language-php">isGranted()</code> dans votre application Symfony, un ensemble de méthodes seront appelées afin de déterminer si oui ou non, un utilisateur aura le droit d'effectuer une certaine action.</p>
+        <p>Vous avez la possibilité d'ajouter vos propres Voters en créant une classe qui implémentera l'interface <code class="language-php">VoterInterface</code> :</p>
+        <pre><code class="language-php">interface VoterInterface
+{
+   const ACCESS_GRANTED = 1;
+   const ACCESS_ABSTAIN = 0;
+   const ACCESS_DENIED = -1;
+   public function vote(TokenInterface $token, $subject, array $attributes);
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Strategy et la sécurité dans Symfony</h3>
+        <p>Le système de <strong>Voters</strong> de Symfony peut être représenté avec le diagramme de classe suivant :</p>
+        <img src="assets/images/strategy-voters.png" alt="Voters">
+        <footer>
+            <a href="https://symfony.com/doc/current/components/security/authorization.html" target="_blank" class="info">Documentation Symfony</a>
+        </footer>
+    </section>
+
+    <section>
+        <h3>Strategy et SwiftMailer</h3>
+        <p>Le bundle SwiftMailer  utilise également le design pattern Strategy afin de permettre de définir dynamiquement le moyen de transport à utiliser (SMTP, Mail, Null...).</p>
+        <p>Lorsque vous utilisez ce service pour envoyer un mail, vous devez en effet définir dans son constructeur le transport à utiliser via un objet passé en paramètre. Cet objet doit implémenter l'interface <code class="language-php">Swift_Transport</code> :</p>
+        <pre><code class="language-php">interface Swift_Transport
+{
+    public function isStarted();
+    public function start();
+    public function stop();
+    public function ping();
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null);
+    public function registerPlugin(Swift_Events_EventListener $plugin);
+}</code></pre>
+    </section>
+
+    <section>
+        <h3>Strategy et SwiftMailer</h3>
+        <p>La classe <code class="language-php">Mailer</code> utilise ensuite cette interface en paramètre de son constructeur :</p>
+        <pre><code class="language-php">public function __construct(Swift_Transport $transport)
+{
+   $this->_transport = $transport;
+}</code></pre>
+        <p>L'organisation de ces différentes classes et interfaces peut être représenté de la façon suivante :</p>
+        <img src="assets/images/strategy-swiftmailer.png" alt="SwiftMailer">
+    </section>
+
+    <section>
+        <h3>Strategy et Doctrine2</h3>
+        <p>L'ORM Doctrine utilise également ce design pattern dans une situation assez classique en développement informatique : La connexion à la base de données.</p>
+        <p>Vous pouvez observer le code source de la classe <a href="https://github.com/doctrine/dbal/blob/master/lib/Doctrine/DBAL/Driver.php" target="_blank">Driver</a> sur le repository Github de Doctrine et vous constaterez qu'il s'agit là-encore d'une implémentation du design pattern Strategy.</p>
+        <p>Si vous regardez les autres fichiers du projet Doctrine, vous pourrez réalisez un diagramme UML similaire à ceux montrés dans les exemples précédents.</p>
     </section>
 
 </section>
