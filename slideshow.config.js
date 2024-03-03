@@ -1,4 +1,5 @@
 module.exports = {
   name: 'PHP Design Patterns',
-  stylesheets: ['assets/css/style.css']
+  stylesheets: [],
+  javascripts: ['assets/js/script.js']
 }
