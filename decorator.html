@@ -5,7 +5,18 @@
     </section>
 
     <section>
-        <h3></h3>
+        <h3>Decorator et le composant Scheduler de Symfony</h3>
+        <p>Le composant Scheduler de Symfony utilise le pattern Decorator pour modifier l'occurence d'une tâche planifiée.</p>
+        <p>Voici un exemple d'utilisation :</p>
+        <pre><code class="language-php">$trigger = new ExcludeTimeTrigger(new JitterTrigger(CronExpressionTrigger::fromSpec('#midnight', new MyMessage()));
+
+$trigger->inner(); // CronExpressionTrigger
+$trigger->decorators(); // [ExcludeTimeTrigger, JitterTrigger]
+</code></pre>
+        <p>
+            Dans cet exemple, une tâche planifiée est déclenchée à minuit, et est ensuite décorée pour être déclenchée de manière décalée
+            (<code class="language-php">JitterTrigger</code>) et exclure certaines dates (<code class="language-php">ExcludeTimeTrigger</code>).
+        </p>
     </section>
 
 </section>
